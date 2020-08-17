@@ -1,4 +1,4 @@
-module github.com/bazelbuild/remote-apis/build/bazel/remote/asset/v1
+module github.com/peterebden/remote-apis/build/bazel/remote/asset/v1
 
 go 1.12
 
