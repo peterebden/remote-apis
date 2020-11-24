@@ -281,7 +281,10 @@ service ActionCache {
 //   surfacing an error to the user.
 //
 // Note that when reading compressed blobs, the `ReadRequest.read_offset`
-// refers to the offset in the uncompressed form of the blob.
+// refers to the offset in the uncompressed form of the blob, and the
+// `ReadRequest.read_limit` refers to the offset in the specific compressed
+// form that the server provides. Clients SHOULD NOT assume that the compressed
+// form is the same or smaller size than the uncompressed form.
 //
 // Servers MAY use any compression level they choose, including different
 // levels for different blobs (e.g. choosing a level designed for maximum
