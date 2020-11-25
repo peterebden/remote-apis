@@ -280,23 +280,20 @@ service ActionCache {
 //   the case of failure such as retrying a limited number of times or
 //   surfacing an error to the user.
 //
-// Note that when reading compressed blobs, the `ReadRequest.read_offset`
-// refers to the offset in the uncompressed form of the blob, and the
-// `ReadRequest.read_limit` refers to the offset in the specific compressed
-// form that the server provides. Clients SHOULD NOT assume that the compressed
-// form is the same or smaller size than the uncompressed form.
-//
-// Servers MAY use any compression level they choose, including different
-// levels for different blobs (e.g. choosing a level designed for maximum
-// speed for data known to be incompressible).
+// When downloading compressed blobs:
+// * `ReadRequest.read_offset` refers to the offset in the uncompressed form
+//   of the blob.
+// * Servers MUST return `INVALID_ARGUMENT` if `ReadRequest.read_limit` is
+//   non-zero.
+// * Servers MAY use any compression level they choose, including different
+//   levels for different blobs (e.g. choosing a level designed for maximum
+//   speed for data known to be incompressible).
+// * Clients SHOULD NOT use gRPC-level compression, since this would compress
+//   already-compressed data.
 //
 // Servers MUST be able to provide data for all recently advertised blobs in
 // each of the compression formats that the server supports, as well as in
 // uncompressed form.
-//
-// Clients SHOULD NOT use gRPC-level compression on ByteStream API `Read`
-// requests for compressed blobs, since this would compress already-compressed
-// data.
 //
 // The lifetime of entries in the CAS is implementation specific, but it SHOULD
 // be long enough to allow for newly-added and recently looked-up entries to be
