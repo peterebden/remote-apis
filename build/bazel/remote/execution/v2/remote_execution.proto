@@ -1463,6 +1463,9 @@ message BatchUpdateBlobsRequest {
 
     // The raw binary data.
     bytes data = 2;
+
+    // The compressor being used for this request.
+    Compressor.Value compressor = 3;
   }
 
   // The instance of the execution system to operate against. A server may
@@ -1504,12 +1507,27 @@ message BatchReadBlobsRequest {
 
   // The individual blob digests.
   repeated Digest digests = 2;
+
+  // A request corresponding to a single blob that the client wants to download.
+  message Request {
+    // The digest to which this request corresponds.
+    Digest digest = 1;
+
+    // The compression method to use for this request.
+    Compressor.Value compressor = 2;
+  }
+
+  // Individual blobs to request in a compressed format.
+  // Blobs requested in this field MAY request the identity compressor.
+  // Servers SHOULD respond with blobs using the requested compressor.
+  repeated Request requests = 3;
 }
 
 // A response message for
 // [ContentAddressableStorage.BatchReadBlobs][build.bazel.remote.execution.v2.ContentAddressableStorage.BatchReadBlobs].
 message BatchReadBlobsResponse {
-  // A response corresponding to a single blob that the client tried to download.
+  // A response corresponding to a single blob that the client tried to
+  // download.
   message Response {
     // The digest to which this response corresponds.
     Digest digest = 1;
@@ -1519,6 +1537,9 @@ message BatchReadBlobsResponse {
 
     // The result of attempting to download that blob.
     google.rpc.Status status = 3;
+
+    // The compression method being used for this response.
+    Compressor.Value compressor = 4;
   }
 
   // The responses to the requests.
@@ -1710,6 +1731,12 @@ message CacheCapabilities {
   // Note that this does not imply which if any compressors are supported by
   // the server at the gRPC level.
   repeated Compressor.Value supported_compressor = 6;
+
+  // Whether the server supports compressing blobs for batch requests
+  // (BatchUpdateBlobs / BatchReadBlobs).
+  // Clients MUST NOT make such requests with any compressor other than identity
+  // if this field is not true.
+  bool batch_compression = 7;
 }
 
 // Capabilities of the remote execution system.
